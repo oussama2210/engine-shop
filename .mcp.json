@@ -8,6 +8,14 @@
         "C:\\Users\\Dz1634\\Desktop\\comeercy\\comeerc",
         "C:\\Users\\Dz1634\\Desktop\\comeercy\\comeerc"
       ]
+    },
+    "codegraph": {
+      "type": "stdio",
+      "command": "codegraph",
+      "args": [
+        "serve",
+        "--mcp"
+      ]
     }
   },
   "preferences": {

@@ -32,8 +32,16 @@ export async function POST(request) {
         { status: 400 }
       );
     }
-    
-    const result = await InventoryService.updateStock(productId, quantity, operation);
+
+    let result;
+    if (operation === 'reserve') {
+      // Atomic optimistic-lock reservation — safe under concurrent requests
+      result = await InventoryService.reserveStockAtomic(productId, quantity);
+    } else if (operation === 'release') {
+      result = await InventoryService.releaseStock(productId, quantity);
+    } else {
+      result = await InventoryService.updateStock(productId, quantity, operation);
+    }
     return NextResponse.json({ success: true, result });
   } catch (error) {
     return NextResponse.json(
