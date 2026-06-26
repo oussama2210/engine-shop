@@ -1,10 +1,12 @@
+import { calcProfit } from "@/lib/profit";
+
 const orders = [
-    { id: "#ORD-001", customer: "Alice Martin", email: "alice@example.com", product: "Wireless Headphones Pro", qty: 1, status: "Delivered", amount: 59.99, date: "Apr 5, 2026" },
-    { id: "#ORD-002", customer: "Bob Chen", email: "bob@example.com", product: "Smart Speaker Mini", qty: 2, status: "Pending", amount: 79.98, date: "Apr 5, 2026" },
-    { id: "#ORD-003", customer: "Sara Kim", email: "sara@example.com", product: "USB-C Fast Charger", qty: 1, status: "Shipped", amount: 24.99, date: "Apr 4, 2026" },
-    { id: "#ORD-004", customer: "James Doe", email: "james@example.com", product: "Wireless Headphones Pro", qty: 1, status: "Cancelled", amount: 59.99, date: "Apr 3, 2026" },
-    { id: "#ORD-005", customer: "Lena Müller", email: "lena@example.com", product: "Smart Speaker Mini", qty: 1, status: "Delivered", amount: 39.99, date: "Apr 2, 2026" },
-    { id: "#ORD-006", customer: "Omar Farsi", email: "omar@example.com", product: "USB-C Fast Charger", qty: 3, status: "Pending", amount: 74.97, date: "Apr 1, 2026" },
+    { id: "#ORD-001", customer: "Alice Martin", email: "alice@example.com", product: "Wireless Headphones Pro", qty: 1, status: "Delivered", amount: 59.99, buyPrice: 35.99, date: "Apr 5, 2026" },
+    { id: "#ORD-002", customer: "Bob Chen", email: "bob@example.com", product: "Smart Speaker Mini", qty: 2, status: "Pending", amount: 79.98, buyPrice: 47.98, date: "Apr 5, 2026" },
+    { id: "#ORD-003", customer: "Sara Kim", email: "sara@example.com", product: "USB-C Fast Charger", qty: 1, status: "Shipped", amount: 24.99, buyPrice: 14.99, date: "Apr 4, 2026" },
+    { id: "#ORD-004", customer: "James Doe", email: "james@example.com", product: "Wireless Headphones Pro", qty: 1, status: "Cancelled", amount: 59.99, buyPrice: 35.99, date: "Apr 3, 2026" },
+    { id: "#ORD-005", customer: "Lena Müller", email: "lena@example.com", product: "Smart Speaker Mini", qty: 1, status: "Delivered", amount: 39.99, buyPrice: 23.99, date: "Apr 2, 2026" },
+    { id: "#ORD-006", customer: "Omar Farsi", email: "omar@example.com", product: "USB-C Fast Charger", qty: 3, status: "Pending", amount: 74.97, buyPrice: 44.97, date: "Apr 1, 2026" },
 ];
 
 const statusColors = {
@@ -46,6 +48,7 @@ export default function OrdersPage() {
                                 <th className="px-6 py-4">Qty</th>
                                 <th className="px-6 py-4">Status</th>
                                 <th className="px-6 py-4">Amount</th>
+                                <th className="px-6 py-4">Profit</th>
                                 <th className="px-6 py-4">Date</th>
                             </tr>
                         </thead>
@@ -66,6 +69,15 @@ export default function OrdersPage() {
                                     </td>
                                     <td className="px-6 py-4 font-semibold text-gray-900">
                                         ${order.amount.toFixed(2)}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {order.buyPrice != null ? (
+                                            <span className="font-semibold text-emerald-600">
+                                                ${calcProfit(order.buyPrice, order.amount / order.qty, order.qty).toFixed(2)}
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-400">—</span>
+                                        )}
                                     </td>
                                     <td className="px-6 py-4 text-gray-400 text-xs">{order.date}</td>
                                 </tr>

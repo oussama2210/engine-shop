@@ -1,8 +1,8 @@
+"use client";
+import React from "react";
 import Container from "@/components/Container";
 import OrderForm from "@/components/order";
 import { SubTitle, SubText } from "@/components/ui/text";
-
-export const metadata = { title: "Checkout — ShopCart" };
 
 export default function CheckoutPage() {
     return (

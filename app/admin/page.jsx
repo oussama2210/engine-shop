@@ -5,8 +5,10 @@ import {
     FaStore,
     FaRegUser,
     FaArrowTrendUp,
+    FaDollarSign,
 } from "react-icons/fa6";
 import Link from "next/link";
+import { calcProfit, calcMargin } from "@/lib/profit";
 
 const stats = [
     {
@@ -15,6 +17,13 @@ const stats = [
         change: "+14% this month",
         icon: FaArrowTrendUp,
         color: "bg-emerald-50 text-emerald-600",
+    },
+    {
+        label: "Total Profit",
+        value: "$4,972",
+        change: "~40% overall margin",
+        icon: FaDollarSign,
+        color: "bg-green-50 text-green-600",
     },
     {
         label: "Total Orders",
@@ -40,11 +49,11 @@ const stats = [
 ];
 
 const initialOrders = [
-    { id: "#ORD-001", customer: "Alice Martin", product: "Wireless Headphones Pro", status: "Delivered", amount: "$59.99", date: "Apr 5, 2026", stock: 10 },
-    { id: "#ORD-002", customer: "Bob Chen", product: "Smart Speaker Mini", status: "Pending", amount: "$39.99", date: "Apr 5, 2026", stock: 25 },
-    { id: "#ORD-003", customer: "Sara Kim", product: "USB-C Fast Charger", status: "Shipped", amount: "$24.99", date: "Apr 4, 2026", stock: 50 },
-    { id: "#ORD-004", customer: "James Doe", product: "Wireless Headphones Pro", status: "Cancelled", amount: "$59.99", date: "Apr 3, 2026", stock: 10 },
-    { id: "#ORD-005", customer: "Lena Müller", product: "Smart Speaker Mini", status: "Processing", amount: "$39.99", date: "Apr 2, 2026", stock: 25 },
+    { id: "#ORD-001", customer: "Alice Martin", product: "Wireless Headphones Pro", status: "Delivered", amount: 59.99, buyPrice: 35.99, qty: 1, date: "Apr 5, 2026", stock: 10 },
+    { id: "#ORD-002", customer: "Bob Chen", product: "Smart Speaker Mini", status: "Pending", amount: 39.99, buyPrice: 23.99, qty: 1, date: "Apr 5, 2026", stock: 25 },
+    { id: "#ORD-003", customer: "Sara Kim", product: "USB-C Fast Charger", status: "Shipped", amount: 24.99, buyPrice: 14.99, qty: 1, date: "Apr 4, 2026", stock: 50 },
+    { id: "#ORD-004", customer: "James Doe", product: "Wireless Headphones Pro", status: "Cancelled", amount: 59.99, buyPrice: 35.99, qty: 1, date: "Apr 3, 2026", stock: 10 },
+    { id: "#ORD-005", customer: "Lena Müller", product: "Smart Speaker Mini", status: "Processing", amount: 39.99, buyPrice: 23.99, qty: 1, date: "Apr 2, 2026", stock: 25 },
 ];
 
 const statusColors = {
@@ -118,6 +127,7 @@ export default function AdminDashboard() {
                                 <th className="px-6 py-3">Stock</th>
                                 <th className="px-6 py-3">Status</th>
                                 <th className="px-6 py-3">Amount</th>
+                                <th className="px-6 py-3">Profit</th>
                                 <th className="px-6 py-3">Date</th>
                             </tr>
                         </thead>
@@ -158,7 +168,16 @@ export default function AdminDashboard() {
                                             </button>
                                         )}
                                     </td>
-                                    <td className="px-6 py-4 font-semibold text-gray-900">{order.amount}</td>
+                                    <td className="px-6 py-4 font-semibold text-gray-900">${order.amount.toFixed(2)}</td>
+                                    <td className="px-6 py-4">
+                                        {order.buyPrice != null ? (
+                                            <span className="font-semibold text-emerald-600">
+                                                ${calcProfit(order.buyPrice, order.amount, order.qty || 1).toFixed(2)}
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-400">—</span>
+                                        )}
+                                    </td>
                                     <td className="px-6 py-4 text-gray-400 text-xs">{order.date}</td>
                                 </tr>
                             ))}

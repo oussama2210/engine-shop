@@ -1,21 +1,38 @@
 import React from "react";
 import Container from "@/components/Container";
 import HomeBanner from "@/components/homebaneer";
-import Cart from "@/components/cart";
-import { sampleProducts } from "@/constant/data";
+import ProductCard from "@/components/card";
 import { SubTitle } from "@/components/ui/text";
-import { InventoryService } from 'lib/inventory';
-export default function Home() {
+import { getProducts } from "@/lib/api-client";
+import { sampleProducts } from "@/constant/data";
+
+export default async function Home() {
+  let products = sampleProducts;
+
+  try {
+    const data = await getProducts({ featured: "true", limit: 10 });
+    if (data?.products?.length > 0) {
+      products = data.products.map((p) => ({
+        id: p.id,
+        title: p.name,
+        category: p.category?.name || "",
+        price: p.price,
+        stock: p.stock,
+        image: p.images?.[0] || "",
+        isSale: !!p.salePrice,
+        isHot: p.featured,
+      }));
+    }
+  } catch {}
+
   return (
     <main className="flex flex-col min-h-screen">
-      {/* Hero Banner */}
       <Container>
         <div className="pt-8 pb-12">
           <HomeBanner />
         </div>
       </Container>
 
-      {/* Featured Products */}
       <Container>
         <div className="pb-16">
           <div className="flex items-center justify-between mb-8">
@@ -28,8 +45,8 @@ export default function Home() {
             </a>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {sampleProducts.map((product) => (
-              <Cart key={product.id} product={product} />
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>

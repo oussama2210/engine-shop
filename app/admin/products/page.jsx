@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { sampleProducts } from "@/constant/data";
 import { FaPlus, FaPen, FaTrash } from "react-icons/fa6";
+import { calcProfit, calcMargin } from "@/lib/profit";
 
 export const metadata = { title: "Products — ShopCart Admin" };
 
@@ -30,6 +31,8 @@ export default function ProductsPage() {
                                 <th className="px-6 py-4">Category</th>
                                 <th className="px-6 py-4">Buy Price</th>
                                 <th className="px-6 py-4">Sell Price</th>
+                                <th className="px-6 py-4">Profit</th>
+                                <th className="px-6 py-4">Margin</th>
                                 <th className="px-6 py-4">Stock</th>
                                 <th className="px-6 py-4">Badges</th>
                                 <th className="px-6 py-4">Actions</th>
@@ -51,6 +54,30 @@ export default function ProductsPage() {
                                         <span className="font-semibold text-gray-900">${product.price.toFixed(2)}</span>
                                         {product.originalPrice && (
                                             <span className="ml-2 text-xs text-gray-400 line-through">${product.originalPrice.toFixed(2)}</span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {product.buyPrice != null ? (
+                                            <span className="font-semibold text-emerald-600">
+                                                ${calcProfit(product.buyPrice, product.price).toFixed(2)}
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-400">—</span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {product.buyPrice != null ? (
+                                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                                                calcMargin(product.buyPrice, product.price) >= 40
+                                                    ? 'bg-green-50 text-green-700'
+                                                    : calcMargin(product.buyPrice, product.price) >= 20
+                                                    ? 'bg-amber-50 text-amber-700'
+                                                    : 'bg-red-50 text-red-600'
+                                            }`}>
+                                                {calcMargin(product.buyPrice, product.price).toFixed(1)}%
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-400">—</span>
                                         )}
                                     </td>
                                     <td className="px-6 py-4">

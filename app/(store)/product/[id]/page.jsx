@@ -1,30 +1,50 @@
 import Container from "@/components/Container";
 import ProductPage from "@/components/proudectPage";
 import OrderForm from "@/components/order";
+import { notFound } from "next/navigation";
+import { getProduct, getProducts } from "@/lib/api-client";
 import { sampleProducts } from "@/constant/data";
-import { notFound } from "next/next";
-import { InventoryService } from '@/lib/inventory';
+
 export async function generateMetadata({ params }) {
     const { id } = await params;
-    const product = sampleProducts.find((p) => p.id === id);
+    let product = sampleProducts.find((p) => p.id === id);
+    try {
+        const data = await getProduct(id);
+        if (data?.name) product = { title: data.name, ...data };
+    } catch {}
     return {
-        title: product ? `${product.title} — ShopCart` : "Product Not Found",
+        title: product ? `${product.title || product.name} — ShopCart` : "Product Not Found",
     };
 }
 
-export const revalidate = 300; // Cache for 5 minutes (300 seconds)
-
 export default async function ProductDetailPage({ params }) {
-    
-    
     const { id } = await params;
-    const product = sampleProducts.find((p) => p.id === id);
+
+    let product = sampleProducts.find((p) => p.id === id);
+    let stock = product?.stock || 0;
+
+    try {
+        const data = await getProduct(id);
+        if (data) {
+            product = {
+                id: data.id,
+                title: data.name,
+                image: data.images?.[0] || product?.image || "",
+                price: data.price,
+                stock: data.stock,
+                description: data.description || product?.description || "",
+                category: data.category?.name || product?.category || "",
+                rating: product?.rating || 0,
+                reviews: product?.reviews || 0,
+            };
+            stock = data.stock;
+        }
+    } catch {}
 
     if (!product) {
         notFound();
     }
 
-    const stock = await InventoryService.getStock(id) || 0;
     const isLowStock = stock > 0 && stock <= 10;
     const isOutOfStock = stock === 0;
 
@@ -38,11 +58,10 @@ export default async function ProductDetailPage({ params }) {
                             name: product.title,
                             price: product.price,
                             stock: product.stock,
-                            description: `High-quality ${product.category} product. Rated ${product.rating}/5 by ${product.reviews} customers.`,
+                            description: product.description || `High-quality ${product.category} product.`,
                         }}
                     />
-                    
-                    {/* Stock Status */}
+
                     <div className="max-w-2xl mx-auto">
                         <div className={`p-4 rounded-xl border-2 ${
                             isOutOfStock ? 'bg-red-50 border-red-200' :
@@ -78,7 +97,7 @@ export default async function ProductDetailPage({ params }) {
                     </div>
 
                     <div className="flex justify-center">
-                        <OrderForm disabled={isOutOfStock} />
+                        <OrderForm />
                     </div>
                 </div>
             </Container>

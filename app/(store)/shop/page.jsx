@@ -1,30 +1,39 @@
 import Container from "@/components/Container";
-import Cart from "@/components/cart";
+import ProductCard from "@/components/card";
+import { getProducts } from "@/lib/api-client";
 import { sampleProducts } from "@/constant/data";
 
 export const metadata = { title: "Shop — ShopCart" };
 
 export default async function ShopPage({ searchParams }) {
-    
-    
     const params = await searchParams;
     const search = params?.search || "";
     const category = params?.category || "";
 
-    // Filter products based on search and category
     let filteredProducts = sampleProducts;
 
-    if (search) {
-        filteredProducts = filteredProducts.filter(product =>
-            product.title.toLowerCase().includes(search.toLowerCase()) ||
-            product.category.toLowerCase().includes(search.toLowerCase())
-        );
-    }
+    try {
+        const data = await getProducts({ search, category, limit: 50 });
+        if (data?.products?.length > 0) {
+            filteredProducts = data.products.map((p) => ({
+                id: p.id,
+                title: p.name,
+                category: p.category?.name || "",
+                price: p.price,
+                stock: p.stock,
+                image: p.images?.[0] || "",
+                isSale: !!p.salePrice,
+                isHot: p.featured,
+            }));
+        }
+    } catch {}
 
-    if (category) {
-        filteredProducts = filteredProducts.filter(product =>
-            product.category.toLowerCase().includes(category.toLowerCase())
-        );
+    if (!filteredProducts.length && (search || category)) {
+        filteredProducts = sampleProducts.filter((p) => {
+            const matchSearch = !search || p.title.toLowerCase().includes(search.toLowerCase()) || p.category.toLowerCase().includes(search.toLowerCase());
+            const matchCategory = !category || p.category.toLowerCase().includes(category.toLowerCase());
+            return matchSearch && matchCategory;
+        });
     }
 
     return (
@@ -51,7 +60,7 @@ export default async function ShopPage({ searchParams }) {
                     {filteredProducts.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                             {filteredProducts.map((product) => (
-                                <Cart key={product.id} product={product} />
+                                <ProductCard key={product.id} product={product} />
                             ))}
                         </div>
                     ) : (
