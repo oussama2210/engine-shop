@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { InventoryService } from '@/lib/inventory';
+import { validateRequired, validateTypes, types, requireAuth, handleApiError, withRateLimit, logSecurityEvent } from '@/lib/security';
 
 export async function GET(request) {
   try {
@@ -14,61 +15,71 @@ export async function GET(request) {
       return NextResponse.json(summary);
     }
   } catch (error) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
-    );
+    return handleApiError(error, request);
   }
 }
 
 export async function POST(request) {
   try {
+    await withRateLimit(request);
+    await requireAuth();
     const body = await request.json();
-    const { productId, quantity, operation = 'set' } = body;
     
-    if (!productId || quantity === undefined) {
-      return NextResponse.json(
-        { error: 'productId and quantity are required' },
-        { status: 400 }
-      );
+    validateRequired(body, ['productId', 'quantity']);
+    validateTypes(body, {
+      productId: { type: 'string', pattern: /^[a-zA-Z0-9_-]+$/ },
+      quantity: { type: 'integer' },
+      operation: { type: 'string', max: 20 },
+    });
+
+    const { productId, quantity, operation = 'set' } = body;
+    const validOps = ['set', 'add', 'subtract', 'reserve', 'release'];
+    if (!validOps.includes(operation)) {
+      return NextResponse.json({ error: 'Invalid operation' }, { status: 400 });
     }
 
     let result;
     if (operation === 'reserve') {
-      // Atomic optimistic-lock reservation — safe under concurrent requests
       result = await InventoryService.reserveStockAtomic(productId, quantity);
     } else if (operation === 'release') {
       result = await InventoryService.releaseStock(productId, quantity);
     } else {
       result = await InventoryService.updateStock(productId, quantity, operation);
     }
+    logSecurityEvent('InventoryUpdated', { productId, operation, quantity });
     return NextResponse.json({ success: true, result });
   } catch (error) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 400 }
-    );
+    return handleApiError(error, request);
   }
 }
 
 export async function PATCH(request) {
   try {
+    await withRateLimit(request);
+    await requireAuth();
     const body = await request.json();
     const { updates } = body;
     
-    if (!Array.isArray(updates)) {
+    if (!Array.isArray(updates) || updates.length > 100) {
       return NextResponse.json(
-        { error: 'Updates must be an array' },
+        { error: 'Updates must be an array of max 100 items' },
         { status: 400 }
       );
     }
     
+    for (const update of updates) {
+      validateRequired(update, ['productId', 'quantity']);
+      validateTypes(update, {
+        productId: { type: 'string' },
+        quantity: { type: 'integer' },
+        operation: { type: 'string', max: 20 },
+      });
+    }
+    
     const results = await InventoryService.bulkUpdateStock(updates);
+    logSecurityEvent('InventoryBulkUpdated', { count: updates.length });
     return NextResponse.json({ success: true, results });
   } catch (error) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 400 }
-    );
+    return handleApiError(error, request);
   }
 }

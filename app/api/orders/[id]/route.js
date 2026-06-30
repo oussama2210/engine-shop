@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { Redis } from '@upstash/redis';
+import { handleApiError } from '@/lib/security';
 
 const redis = Redis.fromEnv();
 
@@ -48,6 +49,6 @@ export async function GET(request, { params }) {
       fromCache: false,
     });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return handleApiError(error, request);
   }
 }

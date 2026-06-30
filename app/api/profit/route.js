@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getProfitSummary, getProductProfit } from '@/lib/profit';
+import { handleApiError } from '@/lib/security';
 
 export async function GET(request) {
   try {
@@ -17,6 +18,6 @@ export async function GET(request) {
     const summary = await getProfitSummary();
     return NextResponse.json(summary);
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return handleApiError(error, request);
   }
 }
