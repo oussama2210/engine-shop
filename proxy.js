@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { logger, startTimer } from "@/lib/logger";
 
 const isProtectedRoute = createRouteMatcher(["/admin(.*)", "/api(.*)"]);
 
@@ -13,6 +14,8 @@ const securityHeaders = {
 };
 
 export default clerkMiddleware(async (auth, req) => {
+  const timer = startTimer();
+
   if (isProtectedRoute(req)) {
     await auth.protect();
   }
@@ -37,6 +40,12 @@ export default clerkMiddleware(async (auth, req) => {
       "form-action 'self'",
     ].join("; ")
   );
+
+  timer.stopAndLog(`${req.method} ${req.nextUrl.pathname}`, "info", {
+    pathname: req.nextUrl.pathname,
+    method: req.method,
+    protected: isProtectedRoute(req),
+  });
 
   return response;
 });
