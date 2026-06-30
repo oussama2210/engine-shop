@@ -5,7 +5,7 @@ import FooterTop from "./footertop";
 import Logo from "./Logo";
 import SocialMedia from "./SocialMedia";
 import { SubText, SubTitle } from "./ui/text";
-import { categoriesData, quickLinksData } from "@/constant/data";
+import { categoriesData } from "@/constant/data";
 import Link from "next/link";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -31,16 +31,10 @@ const Footer = () => {
                     <div>
                         <SubTitle>Quick Links</SubTitle>
                         <ul className="space-y-3 mt-4">
-                            {quickLinksData?.map((item) => (
-                                <li key={item?.title}>
-                                    <Link
-                                        href={item?.href}
-                                        className="hover:text-shop_light_green hoverEffect font-medium"
-                                    >
-                                        {item?.title}
-                                    </Link>
-                                </li>
-                            ))}
+                            <li><Link href="/shop" className="hover:text-shop_light_green hoverEffect font-medium">Shop</Link></li>
+                            <li><Link href="/categories" className="hover:text-shop_light_green hoverEffect font-medium">Categories</Link></li>
+                            <li><Link href="/shop" className="hover:text-shop_light_green hoverEffect font-medium">All Products</Link></li>
+                            <li><Link href="/cart" className="hover:text-shop_light_green hoverEffect font-medium">Cart</Link></li>
                         </ul>
                     </div>
                     <div>
@@ -49,7 +43,7 @@ const Footer = () => {
                             {categoriesData?.map((item) => (
                                 <li key={item?.title}>
                                     <Link
-                                        href={`/category/${item?.href}`}
+                                        href={`/shop?category=${item?.href}`}
                                         className="hover:text-shop_light_green hoverEffect font-medium"
                                     >
                                         {item?.title}
