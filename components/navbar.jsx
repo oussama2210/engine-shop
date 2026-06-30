@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ShoppingBag, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { SignInButton, SignUpButton, UserButton, useAuth } from "@clerk/nextjs";
 import Logo from "./Logo";
 import { useCart } from "@/context/CartContext";
 import { headerData } from "@/constant/data";
@@ -12,6 +13,7 @@ export default function Navbar() {
     const pathname = usePathname();
     const { totalItems, setIsOpen } = useCart();
     const [mobileOpen, setMobileOpen] = useState(false);
+    const { isSignedIn } = useAuth();
 
     return (
         <header className="sticky top-0 z-30 w-full border-b border-gray-100 bg-white/90 backdrop-blur-md">
@@ -41,6 +43,26 @@ export default function Navbar() {
                 <div className="flex items-center gap-3">
                     <div className="hidden sm:block">
                         <SearchBar />
+                    </div>
+
+                    {/* Auth controls */}
+                    <div className="hidden sm:flex items-center gap-2">
+                        {isSignedIn ? (
+                            <UserButton />
+                        ) : (
+                            <>
+                                <SignInButton>
+                                    <button className="text-sm font-semibold text-gray-600 hover:text-[#2a5b46] transition-colors">
+                                        Login
+                                    </button>
+                                </SignInButton>
+                                <SignUpButton>
+                                    <button className="text-sm font-semibold bg-[#2a5b46] text-white px-3 py-1.5 rounded-md hover:bg-[#1e4433] transition-colors">
+                                        Sign Up
+                                    </button>
+                                </SignUpButton>
+                            </>
+                        )}
                     </div>
 
                     {/* Cart button */}
@@ -85,6 +107,25 @@ export default function Navbar() {
                                 {item.title}
                             </Link>
                         ))}
+                        {/* Mobile auth controls */}
+                        {isSignedIn ? (
+                            <div className="px-3 py-2.5 border-t border-gray-100 mt-2 pt-3">
+                                <UserButton />
+                            </div>
+                        ) : (
+                            <div className="flex gap-2 px-3 py-2.5 border-t border-gray-100 mt-2 pt-3">
+                                <SignInButton>
+                                    <button className="flex-1 text-center text-sm font-semibold text-gray-600 hover:text-[#2a5b46] py-2">
+                                        Login
+                                    </button>
+                                </SignInButton>
+                                <SignUpButton>
+                                    <button className="flex-1 text-center text-sm font-semibold bg-[#2a5b46] text-white px-3 py-2 rounded-md hover:bg-[#1e4433]">
+                                        Sign Up
+                                    </button>
+                                </SignUpButton>
+                            </div>
+                        )}
                     </nav>
                 </div>
             )}

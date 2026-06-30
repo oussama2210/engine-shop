@@ -1,13 +1,16 @@
 "use client";
 import React from "react";
+import { useAuth, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import Container from "./Container";
 import Logo from "./Logo";
 import HeaderMenu from "./navbar";
 import SearchBar from "./search";
 import Link from "next/link";
-import { ShoppingBag, Heart, User } from "lucide-react";
+import { ShoppingBag, Heart } from "lucide-react";
 
 const Header = () => {
+    const { isSignedIn } = useAuth();
+
     return (
         <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
             <Container>
@@ -36,13 +39,22 @@ const Header = () => {
                         >
                             <Heart className="w-5 h-5" />
                         </Link>
-                        <Link
-                            href="/sign-in"
-                            className="text-sm font-semibold text-gray-700 hover:text-shop_light_green hoverEffect flex items-center gap-1"
-                        >
-                            <User className="w-4 h-4" />
-                            <span className="hidden sm:inline">Login</span>
-                        </Link>
+                        {isSignedIn ? (
+                            <UserButton />
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <SignInButton>
+                                    <button className="text-sm font-semibold text-gray-700 hover:text-shop_light_green hoverEffect">
+                                        Login
+                                    </button>
+                                </SignInButton>
+                                <SignUpButton>
+                                    <button className="text-sm font-semibold bg-shop_light_green text-white px-3 py-1.5 rounded-md hover:bg-shop_light_green/90 hoverEffect">
+                                        Sign Up
+                                    </button>
+                                </SignUpButton>
+                            </div>
+                        )}
                     </div>
                 </div>
             </Container>

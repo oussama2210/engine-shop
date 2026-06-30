@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { usePathname } from "next/navigation";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { MdCategory } from "react-icons/md";
 import {
     FaBagShopping,
@@ -27,6 +28,7 @@ const navItems = [
 
 const AdminNavbar = () => {
     const pathname = usePathname();
+    const { user } = useUser();
 
     const isActive = (href) => {
         if (href === "/admin") return pathname === "/admin";
@@ -67,8 +69,11 @@ const AdminNavbar = () => {
                 <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
                     <p className="text-xs text-gray-400">Logged in as</p>
                     <p className="text-sm font-bold text-gray-900 truncate mt-0.5">
-                        admin@shopcart.com
+                        {user?.emailAddresses?.[0]?.emailAddress ?? "Admin"}
                     </p>
+                    <div className="mt-2 flex justify-center">
+                        <UserButton />
+                    </div>
                 </div>
             </div>
         </aside>

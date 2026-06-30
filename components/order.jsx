@@ -4,7 +4,7 @@ import { useCart } from "@/context/CartContext";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
-import { FaSpinner, FaCheckCircle, FaExclamationCircle } from "react-icons/fa6";
+import { FaSpinner, FaCircleCheck, FaCircleExclamation } from "react-icons/fa6";
 import Container from "./Container";
 
 export default function OrderForm() {
@@ -105,7 +105,7 @@ export default function OrderForm() {
   if (step === "confirmed") {
     return (
       <div className="text-center py-16 space-y-4">
-        <FaCheckCircle className="text-5xl text-emerald-500 mx-auto" />
+        <FaCircleCheck className="text-5xl text-emerald-500 mx-auto" />
         <h2 className="text-xl font-bold text-gray-900">Order Confirmed!</h2>
         <p className="text-gray-500">Order #{orderNumber}</p>
         <p className="text-sm text-gray-400">You will receive a confirmation shortly.</p>
@@ -122,7 +122,7 @@ export default function OrderForm() {
   if (step === "failed") {
     return (
       <div className="text-center py-16 space-y-4">
-        <FaExclamationCircle className="text-5xl text-red-500 mx-auto" />
+        <FaCircleExclamation className="text-5xl text-red-500 mx-auto" />
         <h2 className="text-xl font-bold text-gray-900">Order Failed</h2>
         <p className="text-gray-500">We couldn&apos;t process your order. Some items may be out of stock.</p>
         <button
