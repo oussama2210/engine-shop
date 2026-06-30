@@ -1,6 +1,8 @@
 import Container from "@/components/Container";
 import ProductCard from "@/components/card";
+import ShopSearch from "@/components/ShopSearch";
 import { getProducts } from "@/lib/api-client";
+import { filterProducts } from "@/lib/search";
 import { sampleProducts } from "@/constant/data";
 
 export const metadata = { title: "Shop — ShopCart" };
@@ -29,32 +31,31 @@ export default async function ShopPage({ searchParams }) {
     } catch {}
 
     if (!filteredProducts.length && (search || category)) {
-        filteredProducts = sampleProducts.filter((p) => {
-            const matchSearch = !search || p.title.toLowerCase().includes(search.toLowerCase()) || p.category.toLowerCase().includes(search.toLowerCase());
-            const matchCategory = !category || p.category.toLowerCase().includes(category.toLowerCase());
-            return matchSearch && matchCategory;
-        });
+        filteredProducts = filterProducts(sampleProducts, { search, category });
     }
 
     return (
         <main className="flex-1">
             <Container>
                 <div className="py-12">
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Shop</h1>
-                        {search && (
-                            <p className="text-gray-500">
-                                Search results for &quot;{search}&quot; ({filteredProducts.length} products)
-                            </p>
-                        )}
-                        {category && !search && (
-                            <p className="text-gray-500">
-                                Category: {category.replace(/-/g, ' ')} ({filteredProducts.length} products)
-                            </p>
-                        )}
-                        {!search && !category && (
-                            <p className="text-gray-500">Browse all products ({filteredProducts.length} items)</p>
-                        )}
+                    <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900 mb-2">Shop</h1>
+                            {search && (
+                                <p className="text-gray-500">
+                                    Search results for &quot;{search}&quot; ({filteredProducts.length} products)
+                                </p>
+                            )}
+                            {category && !search && (
+                                <p className="text-gray-500">
+                                    Category: {category.replace(/-/g, ' ')} ({filteredProducts.length} products)
+                                </p>
+                            )}
+                            {!search && !category && (
+                                <p className="text-gray-500">Browse all products ({filteredProducts.length} items)</p>
+                            )}
+                        </div>
+                        <ShopSearch />
                     </div>
 
                     {filteredProducts.length > 0 ? (

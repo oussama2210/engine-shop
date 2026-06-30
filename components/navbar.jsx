@@ -107,6 +107,10 @@ export default function Navbar() {
                                 {item.title}
                             </Link>
                         ))}
+                        {/* Mobile search */}
+                        <div className="px-3 py-2">
+                            <SearchBar />
+                        </div>
                         {/* Mobile auth controls */}
                         {isSignedIn ? (
                             <div className="px-3 py-2.5 border-t border-gray-100 mt-2 pt-3">
